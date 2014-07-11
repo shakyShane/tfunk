@@ -3,7 +3,7 @@ function isNested(content, regex) {
     var match = regex.exec(content);
 
     if (match) {
-        return /%C(.+?):(.+?)%R/g.exec(match[2]) ? true : false;
+        return /%C(.+?):(.+?)%CR/g.exec(match[2]) ? true : false;
     }
 
     return false;
@@ -11,8 +11,8 @@ function isNested(content, regex) {
 
 function splitter(string) {
 
-    var regex = /%C(.+?):([\s\S]+?)%R(?!.*%R)/g;
-    var tailRegex = /%R(.+?)$/;
+    var regex = /%C(.+?):([\s\S]+?)%CR(?!.*%CR)/g;
+    var tailRegex = /%CR(.+?)$/;
 
     function matcher(regex, content, parts) {
 
@@ -69,7 +69,7 @@ function splitter(string) {
         parts = matcher(regex, string, []);
     } else {
         parts = [];
-        string.replace(/%C(.+?):(.+?)%R/g, function() {
+        string.replace(/%C(.+?):(.+?)%CR/g, function() {
             parts.push({
                 color: arguments[1],
                 content: arguments[2]
