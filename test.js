@@ -1,151 +1,60 @@
-var splitter = require("./index").splitter;
-var isNested = require("./index").isNested;
-var assert   = require("chai").assert;
+var splitter   = require("./index").splitter;
+var isNested   = require("./index").isNested;
+var fixNested  = require("./index").fixNested;
+var getParents = require("./index").getParents;
+var assert     = require("chai").assert;
 
-describe("yo", function () {
-
-    it("can do single colours", function () {
-
-        var string = '%Cgreen:Shane is ace %CR';
-
-        var expected = [
-            {
-                color: "green",
-                content: "Shane is ace "
-            }
-        ];
-
-        var actual = splitter(string);
-
-        assert.deepEqual(actual, expected);
-    });
-
-    it("can smash nested", function () {
-
-        var nestedString = '%Cgreen:Shane %Cred:Osbourne%CR is ace %CR';
-
-        var expected = [
-            {
-                color: "green",
-                content: "Shane "
-            },
-            {
-                color: "red",
-                content: "Osbourne"
-            },
-            {
-                color: "green",
-                content: " is ace "
-            }
-        ];
-
-        var actual = splitter(nestedString);
-
-        assert.deepEqual(actual, expected);
-    });
-
-    it("triple nested", function () {
-
-        var nestedString = '%Cgreen:Shane %Cred:Osbourne%Corange: Aydin is the king!%CR%CR is ace %CR';
-
-        var expected = [
-            {
-                color: "green",
-                content: "Shane "
-            },
-            {
-                color: "red",
-                content: "Osbourne"
-            },
-            {
-                color: "orange",
-                content: " Aydin is the king!"
-            },
-            {
-                color: "green",
-                content: " is ace "
-            }
-        ];
-
-        var actual = splitter(nestedString);
-
-        assert.deepEqual(actual, expected);
-    });
-
-    it("double nested, twice", function () {
-
-        var nestedString = '%Cgreen:Shane %Cred:Osbourne%CR%CR %Cblue: is ace%CR' ;
-
-        var expected = [
-            {
-                color: "green",
-                content: "Shane "
-            },
-            {
-                color: "red",
-                content: "Osbourne"
-            },
-            {
-                color: "blue",
-                content: " is ace"
-            }
-        ];
-
-        var actual = splitter(nestedString);
-
-        assert.deepEqual(actual, expected);
-    });
-
-    it("simple colours", function () {
-
-        var nestedString = '%Cgreen:Shane %CR%Cred:Osbourne%CR';
-
-        var expected = [
-            {
-                color: "green",
-                content: "Shane "
-            },
-            {
-
-                color: "red",
-                content: "Osbourne"
-            }
-        ];
-
-        var actual = splitter(nestedString);
-
-        assert.deepEqual(actual, expected);
-    });
-
-
-});
-
-describe("isNested", function () {
+describe("isNested()", function () {
 
     var regex;
     beforeEach(function () {
-        regex = /%C(.+?):([\s\S]+?)%CR(?!.*%CR)/g;
+        regex = /%C([a-z].+?):([\s\S]+?)+/g;
     });
 
-    it("isNested with non nested string", function() {
+    it("returns true for nested", function () {
 
-        var nonNestedString = '%Cgreen:Shane %CR%Cred:Osbourne%CR';
-        var actual = isNested(nonNestedString, regex);
-        assert.equal(actual, false);
+        var string   = "String: %Cred:This %Cgreen: has %R nested %R %Cred: colours %R";
+        assert.isTrue(isNested(string));
     });
+    it("returns false for none nested", function () {
 
-
-    it("isNested with nested string", function() {
-
-        var nestedString = '%Cgreen:Shane %Cred:Osbourne%Corange: Aydin is the king!%CR%CR is ace %CR';
-        var actual = isNested(nestedString, regex);
-        assert.equal(actual, true);
+        var string   = "String: %Cred:This has two colours %R %Cred: But they are not nested %R";
+        assert.isFalse(isNested(string));
     });
+});
 
-    it("isNested with string with no colours", function() {
+describe("fix nested", function () {
 
-        var nestedString = 'No gay colours here';
-        var actual = isNested(nestedString, regex);
-        assert.equal(actual, false);
+    it("Returns Strings that do not have nested", function () {
+
+        var string   = "%Cred:This has two nested%R %Ccyan:colours%R";
+        var expected = "%Cred:This has two nested%R %Ccyan:colours%R";
+        var actual   = fixNested(string);
+
+        assert.deepEqual(actual, expected);
+    });
+    it("Returns Fixed Strings", function () {
+
+        var string   = "%Cred:This has two %Ccyan:colours%R nested%R";
+        var expected = "%Cred:This has two %Ccyan:colours%R%Cred: nested%R";
+        var actual   = fixNested(string);
+
+        assert.deepEqual(actual, expected);
+    });
+    it("Returns Fixed Strings (2)", function () {
+
+        var string   = "%Cred:This has 3 %Ccyan:colours%R, two of them %Cgreen:nested%R%R";
+        var expected = "%Cred:This has 3 %Ccyan:colours%R%Cred:, two of them %Cgreen:nested%R%R";
+        var actual   = fixNested(string);
+
+        assert.deepEqual(actual, expected);
+    });
+    it("Returns Fixed Strings with 3 nested levels", function () {
+
+//        var string   = "%Cred:This has 3 %Ccyan:nested %Cgreen: levels%R end of second%R end of first%R";
+//        var expected = "%Cred:This has 3 %Ccyan:nested %Cgreen: levels%R%Ccyan: end of second%R%Cred: end of first%R";
+//        var actual   = fixNested(string);
+//
+//        assert.deepEqual(actual, expected);
     });
 });

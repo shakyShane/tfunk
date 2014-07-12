@@ -1,13 +1,108 @@
-function isNested(content, regex) {
+/**
+ * Get the indexes of matches
+ * @param string
+ * @returns {{starts: Array, ends: Array}}
+ */
+function getIndexes(string) {
 
-    var match = regex.exec(content);
+    var starts = [];
+    var ends = [];
 
-    if (match) {
-        return /%C(.+?):(.+?)%CR/g.exec(match[2]) ? true : false;
+    string.replace(/%C/g, function () {
+        starts.push(arguments[1]);
+    });
+
+    string.replace(/%R/g, function () {
+        ends.push(arguments[1]);
+    });
+
+    return {
+        starts: starts,
+        ends: ends
+    }
+}
+
+/**
+ * @param string
+ */
+function getParents(string) {
+
+    var indexes = getIndexes(string);
+    var starts  = indexes.starts;
+    var ends    = indexes.ends;
+
+    var parents = [];
+
+    if (starts.length) {
+        if (starts.length === 1 && ends.length === 1) {
+            parents.push(getSlice(0));
+        }
     }
 
-    return false;
+    return parents;
+
+    function getSlice(index) {
+        return string.slice(starts[index], ends[index] + 2);
+    }
 }
+
+/**
+ * Add the missing colour starts
+ * @param string
+ */
+function fixNested (string) {
+
+    var indexes = getIndexes(string);
+    var starts  = indexes.starts;
+    var ends    = indexes.ends;
+
+    if (!isNested(string)) {
+        return string;
+    }
+
+    var color = string.match(/^%C(.+?):/);
+
+    return spliceSlice(string, ends[0]+2, string.length, color[0]);
+}
+
+/**
+ * Check if there's a nested group
+ * @param string
+ * @returns {boolean}
+ */
+function isNested(string) {
+
+    var indexes = getIndexes(string);
+    var starts  = indexes.starts;
+    var ends    = indexes.ends;
+
+    var nested  = false;
+
+//    console.log("\nstarts: %s", starts.join("|"));
+//    console.log("end:    %s \n", ends.join("|"));
+
+    for (var i = 0, n = starts.length; i < n; i += 1) {
+
+        var nextStart;
+        var nextEnd;
+        var currentStart = starts[i];
+        var currentEnd   = ends[i];
+
+        if ( i !== (starts.length -1) ) {
+
+            nextStart = starts[i + 1];
+            nextEnd = ends[i + 1];
+
+            if (nextStart < currentEnd) {
+                nested = true;
+                return true;
+            }
+        }
+    }
+
+    return nested;
+}
+
 
 function splitter(string) {
 
@@ -16,10 +111,10 @@ function splitter(string) {
 
     function matcher(regex, content, parts) {
 
-        content.replace(regex, function() {
-            var content = arguments[2];
-            var color   = arguments[1];
+        content.replace(regex, function () {
 
+            var content = arguments[2];
+            var color = arguments[1];
 
             var obj = {
                 color: arguments[1],
@@ -28,8 +123,8 @@ function splitter(string) {
 
             var tail = null;
 
-            if(content.match(tailRegex)) {
-                content.replace(tailRegex, function() {
+            if (content.match(tailRegex)) {
+                content.replace(tailRegex, function () {
 
                     var content = arguments[1];
                     match = tailRegex.exec(content);
@@ -57,7 +152,7 @@ function splitter(string) {
                 parts = matcher(regex, content, parts);
             }
 
-            if(tail !== null) {
+            if (tail !== null) {
                 parts.push(tail);
             }
         });
@@ -69,7 +164,7 @@ function splitter(string) {
         parts = matcher(regex, string, []);
     } else {
         parts = [];
-        string.replace(/%C(.+?):(.+?)%CR/g, function() {
+        string.replace(/%C(.+?):(.+?)%CR/g, function () {
             parts.push({
                 color: arguments[1],
                 content: arguments[2]
@@ -80,5 +175,13 @@ function splitter(string) {
     return parts;
 }
 
-module.exports.splitter = splitter;
-module.exports.isNested = isNested;
+function spliceSlice(str, index, count, add) {
+    var before = str.slice(0, index);
+    var after = str.slice(index);
+    return [before, add, after].join("");
+}
+
+module.exports.splitter   = splitter;
+module.exports.isNested   = isNested;
+module.exports.getParents = getParents;
+module.exports.fixNested  = fixNested;
