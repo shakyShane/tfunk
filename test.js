@@ -1,4 +1,5 @@
 var splitter   = require("./index").splitter;
+var dropNoneNested   = require("./index").dropNoneNested;
 var isNested   = require("./index").isNested;
 var fixNested  = require("./index").fixNested;
 var getParents = require("./index").getParents;
@@ -51,10 +52,30 @@ describe("fix nested", function () {
     });
     it("Returns Fixed Strings with 3 nested levels", function () {
 
-//        var string   = "%Cred:This has 3 %Ccyan:nested %Cgreen: levels%R end of second%R end of first%R";
-//        var expected = "%Cred:This has 3 %Ccyan:nested %Cgreen: levels%R%Ccyan: end of second%R%Cred: end of first%R";
-//        var actual   = fixNested(string);
-//
+        var string   = "%Cred:This has 3 %Ccyan:nested %Cgreen: levels%R end of second%R end of first%R %Cred:shane at the end%R";
+        var expected = "%Cred:This has 3 %Ccyan:nested %Cgreen: levels%R%Ccyan: end of second%R%Cred: end of first%R";
+        var actual   = fixNested(string);
+
 //        assert.deepEqual(actual, expected);
     });
+    it("ignore none-nested", function () {
+
+        var starts = [0, 10, 35];
+        var ends   = [20, 30, 45];
+
+        var actual = dropNoneNested(starts, ends);
+
+        assert.deepEqual(actual.starts, [0, 10]);
+        assert.deepEqual(actual.ends, [20, 30]);
+    });
+    it("ignore none-nested multiples", function () {
+
+        var starts = [0, 10, 35, 100];
+        var ends   = [20, 30, 45, 150];
+
+        var actual = dropNoneNested(starts, ends);
+
+        assert.deepEqual(actual.starts, [0, 10]);
+        assert.deepEqual(actual.ends, [20, 30]);
+    })
 });

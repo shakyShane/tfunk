@@ -47,6 +47,31 @@ function getParents(string) {
 }
 
 /**
+ * Remove any sections that are NOT nested, but were caught in the match
+ * @param {Array} starts
+ * @param {Array} ends
+ */
+function dropNoneNested(starts, ends) {
+
+    var newStarts = [starts[0]];
+    var newEnds   = [ends[0]];
+
+    for (var i = 0, n = starts.length; i < n; i += 1) {
+        if (i) {
+            if (starts[i] < ends[i-1]) {
+                newStarts.push(starts[i]);
+                newEnds.push(ends[i]);
+            }
+        }
+    }
+
+    return {
+        starts: newStarts,
+        ends: newEnds
+    }
+}
+
+/**
  * Add the missing colour starts
  * @param string
  */
@@ -59,6 +84,8 @@ function fixNested (string) {
     if (!isNested(string)) {
         return string;
     }
+
+    dropNoneNested(starts, ends);
 
     var color = string.match(/^%C(.+?):/);
 
@@ -78,8 +105,8 @@ function isNested(string) {
 
     var nested  = false;
 
-//    console.log("\nstarts: %s", starts.join("|"));
-//    console.log("end:    %s \n", ends.join("|"));
+    console.log("\nstarts: %s", starts.join("|"));
+    console.log("end:    %s \n", ends.join("|"));
 
     for (var i = 0, n = starts.length; i < n; i += 1) {
 
@@ -185,3 +212,4 @@ module.exports.splitter   = splitter;
 module.exports.isNested   = isNested;
 module.exports.getParents = getParents;
 module.exports.fixNested  = fixNested;
+module.exports.dropNoneNested  = dropNoneNested;
