@@ -208,13 +208,21 @@ function trim(content, context, start) {
  * @param string
  * @returns {XML|string}
  */
-function addColors(string) {
+function addColors(string, custom) {
 
     var regex = /%C([a-zA-Z]+?):([\s\S]+?)(?=%C|%R)/g;
 
     var newstring = string.replace(regex, function () {
+
         var color = arguments[1];
+
+        if (custom && custom[color]) {
+            var func = eval(custom[color]);
+            return func(arguments[2]);
+        }
+
         return chalk[color](arguments[2]);
+
     });
 
     return newstring.replace(/%R/g, "");
@@ -257,11 +265,11 @@ function fixEnding(string) {
  * @param string
  * @returns {string}
  */
-function compile(string) {
+function compile(string, custom) {
     var error = "'%s' not supported. See https://github.com/sindresorhus/chalk#styles for supported styles.";
     var res;
     try {
-        res = addColors(removeDupes(fixIndexes(fixEnding(string))));
+        res = addColors(removeDupes(fixIndexes(fixEnding(string))), custom);
     } catch (e) {
         var color = /Property '(.+?)'/.exec(e.message);
         throw Error(error.replace("%s", color[1]));
@@ -275,13 +283,15 @@ function compile(string) {
  */
 function Compiler(opts) {
 
-    if (opts && opts.prefix) {
-        this.prefix = compile(opts.prefix);
+    opts = opts || {};
+
+    if (opts.prefix) {
+        this.prefix = compile(opts.prefix, opts.custom);
     }
 
     this.compile = function (string) {
 
-        return this.prefix + compile(string);
+        return this.prefix + compile(string, opts.custom);
 
     }.bind(this);
 
