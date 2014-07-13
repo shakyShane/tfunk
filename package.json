@@ -11,5 +11,8 @@
   "devDependencies": {
     "chai": "^1.9.1",
     "mocha": "^1.20.1"
+  },
+  "dependencies": {
+    "chalk": "^0.5.1"
   }
 }

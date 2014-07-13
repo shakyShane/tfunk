@@ -1,3 +1,5 @@
+var chalk = require("chalk");
+
 /**
  * Get the indexes of matches
  * @param string
@@ -23,30 +25,6 @@ function getIndexes(string) {
 }
 
 /**
- * @param string
- */
-function getParents(string) {
-
-    var indexes = getIndexes(string);
-    var starts  = indexes.starts;
-    var ends    = indexes.ends;
-
-    var parents = [];
-
-    if (starts.length) {
-        if (starts.length === 1 && ends.length === 1) {
-            parents.push(getSlice(0));
-        }
-    }
-
-    return parents;
-
-    function getSlice(index) {
-        return string.slice(starts[index], ends[index] + 2);
-    }
-}
-
-/**
  * Remove any sections that are NOT nested, but were caught in the match
  * @param {Array} starts
  * @param {Array} ends
@@ -54,11 +32,11 @@ function getParents(string) {
 function dropNoneNested(starts, ends) {
 
     var newStarts = [starts[0]];
-    var newEnds   = [ends[0]];
+    var newEnds = [ends[0]];
 
     for (var i = 0, n = starts.length; i < n; i += 1) {
         if (i) {
-            if (starts[i] < ends[i-1]) {
+            if (starts[i] < ends[i - 1]) {
                 newStarts.push(starts[i]);
                 newEnds.push(ends[i]);
             }
@@ -75,21 +53,38 @@ function dropNoneNested(starts, ends) {
  * Add the missing colour starts
  * @param string
  */
-function fixNested (string) {
+function fixNested(string) {
 
     var indexes = getIndexes(string);
-    var starts  = indexes.starts;
-    var ends    = indexes.ends;
+    var starts = indexes.starts;
+    var ends = indexes.ends;
 
     if (!isNested(string)) {
         return string;
     }
 
-    dropNoneNested(starts, ends);
+    var newIndexes = dropNoneNested(starts, ends);
 
-    var color = string.match(/^%C(.+?):/);
+    var sectionEnd = newIndexes.ends[(newIndexes.ends.length - 1)] + 2;
+    var stringSubSection = string.slice(newIndexes.starts[0], sectionEnd);
+    var oldStart = string.slice(0, newIndexes.starts[0]);
+    var oldEnd = string.slice(sectionEnd);
 
-    return spliceSlice(string, ends[0]+2, string.length, color[0]);
+    var colors = [];
+
+    stringSubSection.replace(/%C([a-z]+?):/g, function () {
+        colors.push(arguments[1]);
+    });
+
+    var count = 0;
+
+    var replaced = stringSubSection.replace(/%R/g, function () {
+        var string = "%R%C" + colors[count] + ":";
+        count += 1;
+        return string;
+    });
+
+    return oldStart + replaced + oldEnd;
 }
 
 /**
@@ -100,22 +95,18 @@ function fixNested (string) {
 function isNested(string) {
 
     var indexes = getIndexes(string);
-    var starts  = indexes.starts;
-    var ends    = indexes.ends;
+    var starts = indexes.starts;
+    var ends = indexes.ends;
 
-    var nested  = false;
-
-    console.log("\nstarts: %s", starts.join("|"));
-    console.log("end:    %s \n", ends.join("|"));
+    var nested = false;
 
     for (var i = 0, n = starts.length; i < n; i += 1) {
 
         var nextStart;
         var nextEnd;
-        var currentStart = starts[i];
-        var currentEnd   = ends[i];
+        var currentEnd = ends[i];
 
-        if ( i !== (starts.length -1) ) {
+        if (i !== (starts.length - 1)) {
 
             nextStart = starts[i + 1];
             nextEnd = ends[i + 1];
@@ -130,86 +121,179 @@ function isNested(string) {
     return nested;
 }
 
-
-function splitter(string) {
-
-    var regex = /%C(.+?):([\s\S]+?)%CR(?!.*%CR)/g;
-    var tailRegex = /%CR(.+?)$/;
-
-    function matcher(regex, content, parts) {
-
-        content.replace(regex, function () {
-
-            var content = arguments[2];
-            var color = arguments[1];
-
-            var obj = {
-                color: arguments[1],
-                content: content
-            };
-
-            var tail = null;
-
-            if (content.match(tailRegex)) {
-                content.replace(tailRegex, function () {
-
-                    var content = arguments[1];
-                    match = tailRegex.exec(content);
-                    if (null !== match) {
-                        content = match[1];
-                    }
-
-                    tail = {
-                        color: obj.color,
-                        content: content
-                    };
-                });
-            }
-
-            parts.push(obj);
-
-            match = /^(.+?)%C[a-z]/.exec(content);
-            if (null !== match) {
-                obj.content = match[1];
-            } else {
-                obj.content = content;
-            }
-
-            if (content.match(regex)) {
-                parts = matcher(regex, content, parts);
-            }
-
-            if (tail !== null) {
-                parts.push(tail);
-            }
-        });
-
-        return parts;
-    }
-
-    if (isNested(string, regex)) {
-        parts = matcher(regex, string, []);
-    } else {
-        parts = [];
-        string.replace(/%C(.+?):(.+?)%CR/g, function () {
-            parts.push({
-                color: arguments[1],
-                content: arguments[2]
-            });
-        });
-    }
-
-    return parts;
-}
-
-function spliceSlice(str, index, count, add) {
+/**
+ * String splice
+ * @param {string} str
+ * @param {number} index
+ * @param {string} add
+ * @returns {string}
+ */
+function spliceSlice(str, index, add) {
     var before = str.slice(0, index);
     var after = str.slice(index);
     return [before, add, after].join("");
 }
 
-module.exports.splitter   = splitter;
-module.exports.isNested   = isNested;
-module.exports.getParents = getParents;
-module.exports.fixNested  = fixNested;
-module.exports.dropNoneNested  = dropNoneNested;
+/**
+ * Specifically for use with NESTED items
+ * @param string
+ * @returns {*}
+ */
+function fixIndexes(string) {
+
+    if (!isNested(string)) {
+
+        return string;
+
+    } else {
+
+        var indexes = getIndexes(string);
+        var sectionEnd = indexes.ends[(indexes.ends.length - 1)] + 2;
+        var stringSubSection = string.slice(indexes.starts[0], sectionEnd);
+
+        var context = "";
+        var old = "";
+        var initial = "";
+
+        if (indexes.starts[0] > 0) {
+            initial = string.slice(0, indexes.starts[0]);
+        }
+
+        return initial + stringSubSection.replace(/^(%C([a-zA-Z]+?):)([\s\S]+?)%R(?!.*%R)/g, function () {
+            context = arguments[2];
+            old = arguments[0];
+            var content = arguments[3];
+            return  trim(content, context, arguments[1]);
+        });
+    }
+}
+
+/**
+ * @param content
+ * @param context
+ * @param start
+ * @returns {string}
+ */
+function trim(content, context, start) {
+
+    var indexes = getIndexes(content);
+
+    if (indexes.ends[indexes.ends.length - 1] < content.length) {
+
+        // Match that needs fixing
+        var add = "%C" + context + ":";
+
+        var fixed;
+        var count = 0;
+
+        indexes.ends.forEach(function (item, i) {
+            if (!fixed) {
+                fixed = spliceSlice(content, indexes.ends[i] + 2 + count, add);
+            } else {
+                fixed = spliceSlice(fixed, indexes.ends[i] + 2 + count, add);
+            }
+            count += add.length;
+        });
+
+        return start + (fixed || "") + "%R";
+
+    } else {
+
+        return start + content + "%R";
+    }
+}
+
+/**
+ * Run each match through chalk
+ * @param string
+ * @returns {XML|string}
+ */
+function addColors(string) {
+
+    var regex = /%C([a-zA-Z]+?):([\s\S]+?)(?=%C|%R)/g;
+
+    var newstring = string.replace(regex, function () {
+        var color = arguments[1];
+        return chalk[color](arguments[2]);
+    });
+
+    return newstring.replace(/%R/g, "");
+}
+
+/**
+ * Remove any instances with no content %Cred:%R
+ * @param string
+ * @returns {string}
+ */
+function removeDupes(string) {
+    return string.replace(/%C([a-z]+?):%R/g, "");
+}
+
+/**
+ * Ensure all colours are closed
+ * @param string
+ * @returns {*}
+ */
+function fixEnding(string) {
+
+    var indexes = getIndexes(string);
+
+    var diff = indexes.starts.length - indexes.ends.length;
+
+    var append = "";
+
+    if (diff > 0) {
+        for (var i = 0, n = diff; i < n; i += 1) {
+            append += "%R";
+        }
+        return string + append;
+    }
+
+    return string;
+}
+
+/**
+ * Stateless compiler.
+ * @param string
+ * @returns {string}
+ */
+function compile(string) {
+    var error = "'%s' not supported. See https://github.com/sindresorhus/chalk#styles for supported styles.";
+    var res;
+    try {
+        res = addColors(removeDupes(fixIndexes(fixEnding(string))));
+    } catch (e) {
+        var color = /Property '(.+?)'/.exec(e.message);
+        throw Error(error.replace("%s", color[1]));
+    }
+    return res;
+}
+
+/**
+ * @param {Object} opts
+ * @returns {Compiler}
+ */
+function Compiler(opts) {
+
+    if (opts && opts.prefix) {
+        this.prefix = compile(opts.prefix);
+    }
+
+    this.compile = function (string) {
+
+        return this.prefix + compile(string);
+
+    }.bind(this);
+
+    return this;
+}
+
+module.exports.isNested = isNested;
+module.exports.fixNested = fixNested;
+module.exports.dropNoneNested = dropNoneNested;
+module.exports.getIndexes = getIndexes;
+module.exports.fixIndexes = fixIndexes;
+module.exports.addColors = addColors;
+module.exports.fixEnding = fixEnding;
+module.exports.Compiler = Compiler;
+module.exports.compile = compile;
