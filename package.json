@@ -4,13 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/gulp/bin/gulp.js lint-ci && ./node_modules/mocha/bin/mocha test --recursive"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "chai": "^1.9.1",
-    "mocha": "^1.20.1"
+    "mocha": "^1.20.1",
+    "gulp": "^3.8.6",
+    "gulp-jshint": "^1.7.1",
+    "jshint-stylish": "^0.4.0"
   },
   "dependencies": {
     "chalk": "^0.5.1"

@@ -1,13 +1,13 @@
-var dropNoneNested = require("./../index").dropNoneNested;
-var isNested       = require("./../index").isNested;
-var fixNested      = require("./../index").fixNested;
-var addColors      = require("./../index").addColors;
-var fixEnding      = require("./../index").fixEnding;
-var compiler       = require("./../index").Compiler();
-var compilerFn     = require("./../index").compile;
-var fixIndexes     = require("./../index").fixIndexes;
-var assert         = require("chai").assert;
-var stripColor     = require("chalk").stripColor;
+var dropNoneNested   = require("./../index").dropNoneNested;
+var isNested         = require("./../index").isNested;
+var fixNested        = require("./../index").fixNested;
+var addColors        = require("./../index").addColors;
+var fixEnding        = require("./../index").fixEnding;
+var compiler         = require("./../index").Compiler();
+var compilerFn       = require("./../index").compile;
+var fixNestedIndexes = require("./../index").fixNestedIndexes;
+var assert           = require("chai").assert;
+var stripColor       = require("chalk").stripColor;
 
 describe("isNested()", function () {
 
@@ -61,7 +61,7 @@ describe("Fix indexes", function(){
         var string   = "%Cred: Shane %Cgreen: Osbourne%R%R";
         var expected = "%Cred: Shane %Cgreen: Osbourne%R%Cred:%R";
 
-        var actual = fixIndexes(string);
+        var actual = fixNestedIndexes(string);
         assert.equal(actual, expected);
     });
     it("fixes indexes", function () {
@@ -69,7 +69,7 @@ describe("Fix indexes", function(){
         var string   = "%Cred: Shane %Cgreen: Alan %R Osbourne %R";
         var expected = "%Cred: Shane %Cgreen: Alan %R%Cred: Osbourne %R";
 
-        var actual = fixIndexes(string);
+        var actual = fixNestedIndexes(string);
         assert.equal(actual, expected);
     });
     it("fixes indexes", function () {
@@ -77,7 +77,7 @@ describe("Fix indexes", function(){
         var string   = "%Cred: Shane %Cgreen: Alan %R Osbourne %Cblue: is MY Name %R%R";
         var expected = "%Cred: Shane %Cgreen: Alan %R%Cred: Osbourne %Cblue: is MY Name %R%Cred:%R";
 
-        var actual = fixIndexes(string);
+        var actual = fixNestedIndexes(string);
         assert.equal(actual, expected);
     });
     it("fixes indexes", function () {
@@ -85,7 +85,7 @@ describe("Fix indexes", function(){
         var string   = "%Cred: Shane %Cgreen: Alan %R Osbourne %Cblue: is MY Name %R sir %R";
         var expected = "%Cred: Shane %Cgreen: Alan %R%Cred: Osbourne %Cblue: is MY Name %R%Cred: sir %R";
 
-        var actual = fixIndexes(string);
+        var actual = fixNestedIndexes(string);
         assert.equal(actual, expected);
     });
     it("fixes indexes", function () {
@@ -93,7 +93,7 @@ describe("Fix indexes", function(){
         var string   = "Start %Cred: Shane %Cgreen: Alan %R Osbourne %Cblue: is MY Name %R sir %R";
         var expected = "Start %Cred: Shane %Cgreen: Alan %R%Cred: Osbourne %Cblue: is MY Name %R%Cred: sir %R";
 
-        var actual = fixIndexes(string);
+        var actual = fixNestedIndexes(string);
         assert.equal(actual, expected);
     });
 });

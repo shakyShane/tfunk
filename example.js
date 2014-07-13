@@ -1,4 +1,4 @@
-var compile  = require("./index").compile;
+var compile  = require("./index");
 var compiler = require("./index").Compiler({
     prefix: "%Cblue:[%R%Cmagenta:tFunk%R%Ccyan:]%R ",
     custom: {
@@ -23,4 +23,3 @@ console.log( compile("This has a custom %Cwarn:'warn'%R style", {
 console.log( compiler.compile("This has a cool %Cblue:Prefix") );
 
 console.log( compiler.compile("%Cblue:Prefix %Ccyan:with NESTED%R styles and a custom %Cwarn:'warn'") );
-

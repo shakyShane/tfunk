@@ -1,8 +1,49 @@
+"use strict";
+
 var chalk = require("chalk");
 
 /**
+ * Stateless compiler.
+ * @param {String} string
+ * @param {Object} [custom] - Any custom methods
+ * @returns {String}
+ */
+function compile(string, custom) {
+    var error = "'%s' not supported. See https://github.com/sindresorhus/chalk#styles for supported styles.";
+    var res;
+    try {
+        res = addColors(removeDupes(fixNestedIndexes(fixEnding(string))), custom);
+    } catch (e) {
+        var color = /Property '(.+?)'/.exec(e.message);
+        throw Error(error.replace("%s", color[1]));
+    }
+    return res;
+}
+
+/**
+ * @param {Object} opts
+ * @returns {Compiler}
+ */
+function Compiler(opts) {
+
+    opts = opts || {};
+
+    if (opts.prefix) {
+        this.prefix = compile(opts.prefix, opts.custom);
+    }
+
+    this.compile = function (string) {
+
+        return this.prefix + compile(string, opts.custom);
+
+    }.bind(this);
+
+    return this;
+}
+
+/**
  * Get the indexes of matches
- * @param string
+ * @param {String} string
  * @returns {{starts: Array, ends: Array}}
  */
 function getIndexes(string) {
@@ -21,7 +62,7 @@ function getIndexes(string) {
     return {
         starts: starts,
         ends: ends
-    }
+    };
 }
 
 /**
@@ -46,7 +87,7 @@ function dropNoneNested(starts, ends) {
     return {
         starts: newStarts,
         ends: newEnds
-    }
+    };
 }
 
 /**
@@ -55,20 +96,17 @@ function dropNoneNested(starts, ends) {
  */
 function fixNested(string) {
 
-    var indexes = getIndexes(string);
-    var starts = indexes.starts;
-    var ends = indexes.ends;
-
     if (!isNested(string)) {
         return string;
     }
 
-    var newIndexes = dropNoneNested(starts, ends);
+    var indexes          = getIndexes(string);
+    var newIndexes       = dropNoneNested(indexes.starts, indexes.ends);
+    var sectionEnd       = newIndexes.ends[(newIndexes.ends.length - 1)] + 2;
 
-    var sectionEnd = newIndexes.ends[(newIndexes.ends.length - 1)] + 2;
     var stringSubSection = string.slice(newIndexes.starts[0], sectionEnd);
-    var oldStart = string.slice(0, newIndexes.starts[0]);
-    var oldEnd = string.slice(sectionEnd);
+    var oldStart         = string.slice(0, newIndexes.starts[0]);
+    var oldEnd           = string.slice(sectionEnd);
 
     var colors = [];
 
@@ -89,8 +127,8 @@ function fixNested(string) {
 
 /**
  * Check if there's a nested group
- * @param string
- * @returns {boolean}
+ * @param {String} string
+ * @returns {Boolean}
  */
 function isNested(string) {
 
@@ -123,9 +161,9 @@ function isNested(string) {
 
 /**
  * String splice
- * @param {string} str
- * @param {number} index
- * @param {string} add
+ * @param {String} str
+ * @param {Number} index
+ * @param {String} add
  * @returns {string}
  */
 function spliceSlice(str, index, add) {
@@ -139,7 +177,7 @@ function spliceSlice(str, index, add) {
  * @param string
  * @returns {*}
  */
-function fixIndexes(string) {
+function fixNestedIndexes(string) {
 
     if (!isNested(string)) {
 
@@ -205,8 +243,9 @@ function trim(content, context, start) {
 
 /**
  * Run each match through chalk
- * @param string
- * @returns {XML|string}
+ * @param {String} string
+ * @param {Object} [custom]
+ * @returns {String}
  */
 function addColors(string, custom) {
 
@@ -239,8 +278,8 @@ function removeDupes(string) {
 
 /**
  * Ensure all colours are closed
- * @param string
- * @returns {*}
+ * @param {String} string
+ * @returns {String}
  */
 function fixEnding(string) {
 
@@ -260,50 +299,12 @@ function fixEnding(string) {
     return string;
 }
 
-/**
- * Stateless compiler.
- * @param string
- * @returns {string}
- */
-function compile(string, custom) {
-    var error = "'%s' not supported. See https://github.com/sindresorhus/chalk#styles for supported styles.";
-    var res;
-    try {
-        res = addColors(removeDupes(fixIndexes(fixEnding(string))), custom);
-    } catch (e) {
-        var color = /Property '(.+?)'/.exec(e.message);
-        throw Error(error.replace("%s", color[1]));
-    }
-    return res;
-}
-
-/**
- * @param {Object} opts
- * @returns {Compiler}
- */
-function Compiler(opts) {
-
-    opts = opts || {};
-
-    if (opts.prefix) {
-        this.prefix = compile(opts.prefix, opts.custom);
-    }
-
-    this.compile = function (string) {
-
-        return this.prefix + compile(string, opts.custom);
-
-    }.bind(this);
-
-    return this;
-}
-
+module.exports = compile;
 module.exports.isNested = isNested;
 module.exports.fixNested = fixNested;
 module.exports.dropNoneNested = dropNoneNested;
 module.exports.getIndexes = getIndexes;
-module.exports.fixIndexes = fixIndexes;
+module.exports.fixNestedIndexes = fixNestedIndexes;
 module.exports.addColors = addColors;
 module.exports.fixEnding = fixEnding;
 module.exports.Compiler = Compiler;
-module.exports.compile = compile;
