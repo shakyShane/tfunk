@@ -1,11 +1,10 @@
-tfunk
+##tfunk
 
 Multi-Colors from [Chalk](https://github.com/sindresorhus/chalk#styles), 
 but without the string concatenation. 
 
 ```js
 var compile  = require("./index").compile;
-var compiler = require("./index").Compiler({prefix: "%Cblue:[%R%Cmagenta:tFunk%R%Ccyan:]%R "});
 
 console.log( compile("%Cred:This has a single colour") );
 
