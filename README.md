@@ -20,6 +20,6 @@ console.log( compile("This has a custom %Cwarn:'warn'%R style", {
 
 console.log( compiler.compile("This has a cool %Cblue:Prefix") );
 
-console.log( compiler.compile("%Cblue:Prefix %Ccyan:with NESTED%R styles and a custom %Cwarn:'warn'") );
+console.log( compiler.compile("%Cblue:Prefix with %Ccyan:NESTED%R styles and a custom %Cwarn:'warn'") );
 
 ```
