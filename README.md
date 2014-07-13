@@ -3,6 +3,8 @@
 Multi-Colors from [Chalk](https://github.com/sindresorhus/chalk#styles), 
 but without the string concatenation. 
 
+![tfunk](http://cl.ly/image/2H2e0e0B0v1k/Screen%20Shot%202014-07-13%20at%2001.56.26.png)
+
 ```js
 console.log( compile("%Cred:This has a single colour") );
 
