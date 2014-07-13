@@ -37,3 +37,11 @@ console.log( chalk.green("This has a colour " + chalk.cyan("nested inside") + " 
 
 //tFunk
 console.log( compile("%Cgreen:This has a colour %Ccyan:nested inside%R another colour") );
+
+compiler = require("./index").Compiler({
+    prefix: "[%Cmagenta:tFunk%R]"
+});
+
+console.log( compiler.compile(" tFunk is awesome") );
+console.log( compiler.compile(" don't you think?") );
+
