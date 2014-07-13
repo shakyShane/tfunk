@@ -8,14 +8,21 @@ var chalk = require("chalk");
  * @param {Object} [custom] - Any custom methods
  * @returns {String}
  */
+
+var chalkError = "'%s' not supported. See https://github.com/sindresorhus/chalk#styles for supported styles.";
+
 function compile(string, custom) {
-    var error = "'%s' not supported. See https://github.com/sindresorhus/chalk#styles for supported styles.";
     var res;
     try {
         res = addColors(removeDupes(fixNestedIndexes(fixEnding(string))), custom);
     } catch (e) {
         var color = /Property '(.+?)'/.exec(e.message);
-        throw Error(error.replace("%s", color[1]));
+
+        if (color) {
+            throw Error(chalkError.replace("%s", color[1]));
+        } else {
+            throw Error(e.message);
+        }
     }
     return res;
 }
@@ -242,6 +249,15 @@ function trim(content, context, start) {
 }
 
 /**
+ *
+ * @param string
+ * @returns {Array|{index: number, input: string}|*}
+ */
+function isValidChalkMethod(string) {
+    return string.match(/^([a-zA-Z\.]+)$/);
+}
+
+/**
  * Run each match through chalk
  * @param {String} string
  * @param {Object} [custom]
@@ -254,9 +270,21 @@ function addColors(string, custom) {
     var newstring = string.replace(regex, function () {
 
         var color = arguments[1];
+        var func;
 
         if (custom && custom[color]) {
-            var func = eval(custom[color]);
+
+            if (typeof custom[color] === "string") {
+
+                if (isValidChalkMethod(custom[color])) {
+                    func = eval(custom[color]);
+                } else {
+                    throw Error(chalkError.replace("%s", custom[color]));
+                }
+            } else if (typeof custom[color] === "function") {
+                func = custom[color];
+            }
+
             return func(arguments[2]);
         }
 

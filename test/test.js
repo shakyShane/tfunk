@@ -142,6 +142,10 @@ describe("Adding Colors", function(){
     });
 });
 
+describe("Valid chalk methods", function(){
+
+});
+
 describe("E2E", function(){
     it("", function(){
         compiler.compile("%Cred:This has two non-nested%R %Ccyan:colours%R");
