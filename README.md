@@ -14,8 +14,20 @@ npm install tfunk
 
 ##Usage
 
-**Use the module directly for simple styling**
- 
+**Syntax rules:**
+
+`%C` `<color>` `:` `YOUR STRING` `%R`
+
+**Example**
+
+`%Cblue:This is a blue line%R`
+
+**`%R` is optional**
+
+`%Cblue:This is a blue line` <- Perfectly valid 
+
+
+##Usage
 ```js
 var tFunk = require("tfunk");
 
