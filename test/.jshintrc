@@ -9,19 +9,10 @@
     "undef": false,
     "unused": false,
     "quotmark": "double",
+    "laxbreak": true,
     "evil": true,
     "boss": true,
     "eqnull": true,
     "node": true,
-    "globals": {
-        "describe" : false,
-        "it" : false,
-        "expect" : false,
-        "runs" : false,
-        "waitsFor" : false,
-        "beforeEach" : false,
-        "afterEach" : false,
-        "before" : false,
-        "after" : false
-    }
+    "mocha": true
 }
