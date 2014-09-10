@@ -4,14 +4,7 @@ Multi-colour console output from [Chalk](https://github.com/sindresorhus/chalk#s
 
 by [@shakyshane](https://github.com/shakyShane) & [@AydinHassan](https://github.com/AydinHassan)
 
-![tfunk](http://cl.ly/image/2H2e0e0B0v1k/Screen%20Shot%202014-07-13%20at%2001.56.26.png)
-
-Probably not the fastest thing in the world, but if you ever wanted a cool way of doing console colours - without 
-all the string concatenation, then you might just love this tool :)
-
-##WARNING: Experimental phase!
-
-Some things may not work as expected yet - but we have colours, nested colours, custom styles & prefixes already nailed.
+![tfunk](http://f.cl.ly/items/15102k441h1U1Z1l253J/Screen%20Shot%202014-09-10%20at%2022.05.15.png)
 
 ##Install
 
@@ -129,10 +122,23 @@ console.log( chalk.blue("Multiple " + chalk.cyan("NESTED") + " styles in " + cha
 console.log( tFunk("%Cblue:Multiple %Ccyan:NESTED%R styles in %Cred:the same string%R with an ending") );
 ```
 
+###Multi line
+```js
+var multiline = require("multiline");
+
+var string = multiline(function () {/*
+%Ccyan:This is a multi-line coloured string
+With a single %Cyellow:yellow%R word in the center of a line
+Pretty cool huh?
+*/});
+
+console.log( tFunk(string) );
+```
+
 ##TODO
 - [x] Colours
 - [x] Nested Colours
 - [x] Custom syntax
 - [x] Prefixed compiler
-- [ ] Make the chain-able API work like this `"%Cwhite.bgRed: White text, red BG"`
+- [x] Make the chain-able API work like this `"%Cwhite.bgRed: White text, red BG"`
 - [ ] Offer a way of escaping. Right now, ALL instances of `%R` will be lost
