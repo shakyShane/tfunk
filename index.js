@@ -1,30 +1,28 @@
 "use strict";
 
-var chalk  = require("chalk");
-var parser = require("./lib/parser");
+var chalk      = require("chalk");
+var parser     = require("./lib/parser");
+var objectPath = require("object-path");
 
 /**
  * Stateless compiler.
  * @param {String} string
  * @param {Object} [custom] - Any custom methods
+ * @param {Object} [opts] - Options
  * @returns {String}
  */
-var chalkError = "'%s' not supported. See https://github.com/sindresorhus/chalk#styles for supported styles.";
-
-function compile(string, custom) {
-    var res;
-    try {
-        res = parseAst(createAst(parser, string));
-    } catch (e) {
-        var color = /Property '(.+?)'/.exec(e.message);
-
-        if (color) {
-            throw Error(chalkError.replace("%s", color[1]));
-        } else {
-            throw Error(e.message);
+function compile(string, custom, opts) {
+    opts = opts || {};
+    return parseAst(createAst(parser, string), custom, function (err, out) {
+        if (err) {
+            if (opts.logErrors) {
+                console.log(err.msg);
+            }
+            if (opts.failOnError) {
+                throw Error(err.msg);
+            }
         }
-    }
-    return res;
+    });
 }
 
 /**
@@ -38,42 +36,42 @@ function createAst(parser, string) {
 
 /**
  * @param ast
+ * @param custom
  */
-function parseAst(ast) {
+function parseAst(ast, custom, cb) {
 
-    var color  = null;
     var colors = [];
 
     return ast.reduce(function (joined, item) {
 
-        if (item.color && item.text) {
-            color = item.color;
-            colors.push(item.color);
-            return joined + chalk[item.color](item.text);
+        var fn;
+
+        if (item.color) {
+            if (item.text) {
+                if (fn = resolveFun(item.color, custom)) {
+                    colors.push(fn);
+                    return joined + fn(item.text);
+                } else {
+                    cb({
+                        msg: "Method does not exist: " + item.color
+                    });
+                    return joined + item.text;
+                }
+            }
         }
 
         if (item.buffer) {
-
-            if (item.buffer === "%R") {
-                return joined;
-            }
-            if (colors.length) {
-                return joined + chalk[colors[colors.length-1]](item.buffer);
-            } else {
-                return joined + item.buffer;
-            }
+            return colors.length
+                ? joined + colors[colors.length-1](item.buffer)
+                : joined + item.buffer;
         }
 
         if (item.reset) {
-
             colors.pop();
-
             if (item.text) {
-                if (colors.length) {
-                    return joined + chalk[colors[colors.length-1]](item.text);
-                } else {
-                    return joined + item.text;
-                }
+                return colors.length
+                    ? joined + colors[colors.length-1](item.text)
+                    : joined + item.text;
             }
         }
 
@@ -82,27 +80,53 @@ function parseAst(ast) {
     }, "");
 }
 
-///**
-// * @param {Object} opts
-// * @returns {Compiler}
-// */
-//function Compiler(opts) {
-//
-//    opts = opts || {};
-//
-//    if (opts.prefix) {
-//        this.prefix = compile(opts.prefix, opts.custom);
-//    }
-//
-//    this.compile = function (string) {
-//
-//        return this.prefix + compile(string, opts.custom);
-//
-//    }.bind(this);
-//
-//    return this;
-//}
+/**
+ * @param path
+ * @param custom
+ * @returns {*}
+ */
+function resolveFun(path, custom) {
+
+    var fn;
+    if (fn = getFun(custom, path)) {
+        return fn.bind({compile:compile});
+    }
+
+    return  getFun(chalk, path);
+}
+
+/**
+ * Get a function from an object
+ */
+function getFun(obj, path) {
+
+    if (!obj) {
+        return false;
+    }
+
+    return objectPath.get(obj, path);
+}
+
+/**
+* @param {Object} opts
+* @returns {Compiler}
+*/
+function Compiler(opts) {
+
+    opts = opts || {};
+
+    if (opts.prefix) {
+        this.prefix = compile(opts.prefix, opts.custom, opts);
+    }
+
+    this.compile = function (string) {
+
+        return this.prefix + compile(string, opts.custom, opts);
+
+    }.bind(this);
+
+    return this;
+}
 
 module.exports = compile;
-//module.exports.fixEnding = fixEnding;
-//module.exports.Compiler = Compiler;
+module.exports.Compiler = Compiler;

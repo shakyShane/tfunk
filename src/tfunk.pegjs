@@ -17,7 +17,7 @@ tag
   = ld c:color ":" e:(!ld !rd b:. {return b})+ { return {color: c, text: e.join('')}}
 
 color
-  = c:[a-z]+ { return c.join('') }
+  = c:[a-zA-Z\.]+ { return c.join('') }
 
 reset
   = rd e:after? {return {reset: true, text: e ? e.join('') : '' }}
