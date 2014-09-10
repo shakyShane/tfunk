@@ -42,6 +42,7 @@
     "jshint-stylish": "^0.4.0"
   },
   "dependencies": {
-    "chalk": "^0.5.1"
+    "chalk": "^0.5.1",
+    "pegjs": "^0.8.0"
   }
 }
