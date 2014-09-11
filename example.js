@@ -2,7 +2,7 @@ var compile   = require("./index");
 var chalk     = require("chalk");
 var multiline = require("multiline");
 var compiler = require("./index").Compiler({
-    prefix: "%Cblue:[%R%Cmagenta:tFunk%R%Ccyan:]%R ",
+    prefix: "{blue:[}{magenta:tFunk}{cyan:]} ",
     custom: {
         "warn": "chalk.bgRed.white",
         "shane": function (string) {
@@ -11,40 +11,40 @@ var compiler = require("./index").Compiler({
     }
 });
 
-console.log( compile("%Cred:This has a single colour") );
+console.log( compile("{red:This has a single colour") );
 
-console.log( compile("This has a single colour %Ccyan:that begins mid-string") );
+console.log( compile("This has a single colour {cyan:that begins mid-string") );
 
-console.log( compile("%Cred:This has a single colour with %Ra reset") );
+console.log( compile("{red:This has a single colour with }a reset") );
 
-console.log( compile("%Cgreen:This has %Ccyan:two colours") );
+console.log( compile("{green:This has {cyan:two colours") );
 
-console.log( compile("%Cgreen:This has a colour %Ccyan:nested inside%R another colour") );
+console.log( compile("{green:This has a colour {cyan:nested inside} another colour") );
 
-console.log( compile("%Cgreen:This has %Ccyan:THREE levels of %Cmagenta:nested%R colors that%R can be reset") );
+console.log( compile("{green:This has {cyan:THREE levels of {magenta:nested} colors that} can be reset") );
 
-//console.log( compile("This has a custom %Cwarn:'warn'%R style", {
+//console.log( compile("This has a custom {warn:'warn'} style", {
 //    "warn": "chalk.bgRed.white"
 //}));
 //
-console.log( compiler.compile("This has a cool %Cblue:Prefix") );
+console.log( compiler.compile("This has a cool {blue:Prefix") );
 //
-//console.log( compiler.compile("%Cblue:Prefix %Ccyan:with NESTED%R styles and a custom %Cwarn:'warn'") );
+//console.log( compiler.compile("{blue:Prefix {cyan:with NESTED} styles and a custom {warn:'warn'") );
 
-console.log( compile("%Cblue:Multiple %Ccyan:NESTED%R %Cred:NESTED2%R styles in %Cred:the same string%R with an ending") );
+console.log( compile("{blue:Multiple {cyan:NESTED} {red:NESTED2} styles in {red:the same string} with an ending") );
 //console.log( chalk.blue("Multiple " + chalk.cyan("NESTED "+ chalk.red("NESTED2")) + " styles in " + chalk.red("the same string") + " with an ending"));
 
-console.log( compile("%Cblue.bgRed.bold:Chained Chalk methods%R") );
+console.log( compile("{blue.bgRed.bold:Chained Chalk methods}") );
 
-console.log( compile("%Cwarn:Methods", {
+console.log( compile("{warn:Methods", {
     "warn": function (string) {
-        return this.compile("%Cred:Custom " + string);
+        return this.compile("{red:Custom " + string);
     }
 }));
 
 var string = multiline(function () {/*
-%Ccyan:This is a multi-line coloured string
-With a single %Cyellow:yellow%R word in the center of a line
+{cyan:This is a multi-line coloured string
+With a single {yellow:yellow} word in the center of a line
 Pretty cool huh?
 */});
 

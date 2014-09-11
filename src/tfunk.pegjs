@@ -26,10 +26,10 @@ after
   = (!ld !rd after:. {return after})+
 
 ld
-  = "%C"
+  = "{"
 
 rd
-  = "%R"
+  = "}"
 
 eol
   = "\n"        //line feed

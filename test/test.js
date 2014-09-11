@@ -7,7 +7,7 @@ describe("Adding Colors", function(){
 
     it("should strip all templating", function(){
 
-        var string   = "%Cred: Shane %Cgreen: Alan %R%Cred: Osbourne %Cblue: is MY Name %R%Cred: sir %R";
+        var string   = "{red: Shane {green: Alan }{red: Osbourne {blue: is MY Name }{red: sir }";
         var expected = " Shane  Alan  Osbourne  is MY Name  sir ";
         var actual = stripColor(compilerFn(string));
 
@@ -15,7 +15,7 @@ describe("Adding Colors", function(){
     });
     it("should strip all templating (2)", function(){
 
-        var string   = "%Cred:This has two non-nested%R %Ccyan:colours%R";
+        var string   = "{red:This has two non-nested} {cyan:colours}";
         var expected = "This has two non-nested colours";
         var actual = stripColor(compilerFn(string));
 
@@ -23,7 +23,7 @@ describe("Adding Colors", function(){
     });
     it("should strip all templating (3)", function(){
 
-        var string   = "OH yeah %Cred:This has two non-nested%R %Ccyan:colours%R";
+        var string   = "OH yeah {red:This has two non-nested} {cyan:colours}";
         var expected = "OH yeah This has two non-nested colours";
         var actual = stripColor(compilerFn(string));
 
@@ -33,14 +33,14 @@ describe("Adding Colors", function(){
 
 describe("Paths for chained CHALK methods", function(){
     it("", function(){
-        var out = compilerFn("%Cblue.bgRed.bold:This has two non-nested");
+        var out = compilerFn("{blue.bgRed.bold:This has two non-nested");
         assert.equal(out, "\u001b[1m\u001b[41m\u001b[34mThis has two non-nested\u001b[39m\u001b[49m\u001b[22m");
     });
 });
 
 describe("Custom functions", function(){
     it("can use custom functions", function(){
-        var out = compilerFn("%Cshane:This has two non-nested", {
+        var out = compilerFn("{shane:This has two non-nested", {
             "shane": function () {
                 return "shane is awesome";
             }
@@ -48,9 +48,9 @@ describe("Custom functions", function(){
         assert.equal(out, "shane is awesome");
     });
     it("can use the compiler internally", function(){
-        var out = compilerFn("%Cshane:This has two non-nested", {
+        var out = compilerFn("{shane:This has two non-nested", {
             "shane": function () {
-                return this.compile("%Cred:shane is awesome");
+                return this.compile("{red:shane is awesome");
             }
         });
         assert.equal(out, "\u001b[31mshane is awesome\u001b[39m");

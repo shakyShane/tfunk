@@ -16,22 +16,22 @@ npm install tfunk
 
 **Syntax rules:**
 
-`%C` `<color>` `:` `YOUR STRING` `%R`
+`{` `<color>` `:` `YOUR STRING` `}`
 
 **Example**
 
-`%Cblue:This is a blue line%R`
+`{blue:This is a blue line}`
 
-**`%R` is optional**
+**`}` is optional**
 
-`%Cblue:This is a blue line` <- Perfectly valid 
+`{blue:This is a blue line` <- Perfectly valid 
 
 
 ##Usage
 ```js
 var tFunk = require("tfunk");
 
-console.log( tfunk("%Ccyan:tFunk terminal colours") )
+console.log( tfunk("{cyan:tFunk terminal colours") )
 
 // => tFunk terminal colours
 ```
@@ -40,7 +40,7 @@ Or get a custom compiler with a set prefix:
 
 ```js
 var compiler = require("tfunk").Compiler({
-    prefix: "[%Cmagenta:tFunk%R]"
+    prefix: "[{magenta:tFunk}]"
 });
 
 console.log( compiler.compile(" tFunk is awesome") );
@@ -65,7 +65,7 @@ var compiler = require("tfunk").Compiler({
 Now you can use `warn` anywhere you like.
 
 ```js
-console.log( compiler.compile("Oh no! There was an %Cwarn:Error") );
+console.log( compiler.compile("Oh no! There was an {warn:Error") );
 
 // => Oh no! There was an Error
 ```
@@ -81,7 +81,7 @@ Here are some comparisons to chalk, to help you understand how to use tFunk.
 console.log( chalk.red("This has a single colour") );
 
 // tFunk
-console.log( tFunk("%Cred:This has a single colour") );
+console.log( tFunk("{red:This has a single colour") );
 ```
 
 ###Single Colour mid string
@@ -91,7 +91,7 @@ console.log( tFunk("%Cred:This has a single colour") );
 console.log( "This has a single colour " + chalk.cyan("that begins mid-string") );
 
 // tFunck
-console.log( tFunk("This has a single colour %Ccyan:that begins mid-string") );
+console.log( tFunk("This has a single colour {cyan:that begins mid-string") );
 ```
 
 ###Single Colour with end point
@@ -101,7 +101,7 @@ console.log( tFunk("This has a single colour %Ccyan:that begins mid-string") );
 console.log( chalk.red("This has a single colour with ") + "an endpoint");
 
 // tFunk
-console.log( tFunk("%Cred:This has a single colour with %Ran endpoint") );
+console.log( tFunk("{red:This has a single colour with }an endpoint") );
 ```
 
 ###Two Colours
@@ -111,7 +111,7 @@ console.log( tFunk("%Cred:This has a single colour with %Ran endpoint") );
 console.log( chalk.green("This has ") + chalk.cyan("two colours") );
 
 // tFunk
-console.log( tFunk("%Cgreen:This has %Ccyan:two colours") );
+console.log( tFunk("{green:This has {cyan:two colours") );
 ```
 
 ###Nested Colours
@@ -121,7 +121,7 @@ console.log( tFunk("%Cgreen:This has %Ccyan:two colours") );
 console.log( chalk.green("This has a colour " + chalk.cyan("nested inside") + " another colour") );
 
 //tFunk
-console.log( tFunk("%Cgreen:This has a colour %Ccyan:nested inside%R another colour") );
+console.log( tFunk("{green:This has a colour {cyan:nested inside} another colour") );
 ```
 
 ###Multiple Nested
@@ -131,7 +131,7 @@ console.log( tFunk("%Cgreen:This has a colour %Ccyan:nested inside%R another col
 console.log( chalk.blue("Multiple " + chalk.cyan("NESTED") + " styles in " + chalk.red("the same string") + " with an ending") );
 
 // tFunk
-console.log( tFunk("%Cblue:Multiple %Ccyan:NESTED%R styles in %Cred:the same string%R with an ending") );
+console.log( tFunk("{blue:Multiple {cyan:NESTED} styles in {red:the same string} with an ending") );
 ```
 
 ###Multi line
@@ -139,8 +139,8 @@ console.log( tFunk("%Cblue:Multiple %Ccyan:NESTED%R styles in %Cred:the same str
 var multiline = require("multiline");
 
 var string = multiline(function () {/*
-%Ccyan:This is a multi-line coloured string
-With a single %Cyellow:yellow%R word in the center of a line
+{cyan:This is a multi-line coloured string
+With a single {yellow:yellow} word in the center of a line
 Pretty cool huh?
 */});
 
@@ -152,5 +152,5 @@ console.log( tFunk(string) );
 - [x] Nested Colours
 - [x] Custom syntax
 - [x] Prefixed compiler
-- [x] Make the chain-able API work like this `"%Cwhite.bgRed: White text, red BG"`
-- [ ] Offer a way of escaping. Right now, ALL instances of `%R` will be lost
+- [x] Make the chain-able API work like this `"{white.bgRed: White text, red BG"`
+- [ ] Offer a way of escaping. Right now, ALL instances of `}` will be lost
