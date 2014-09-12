@@ -108,20 +108,22 @@ function getFun(obj, path) {
 }
 
 /**
-* @param {Object} opts
-* @returns {Compiler}
-*/
-function Compiler(opts) {
+ * @param {Object} [opts]
+ * @param {Object} custom
+ * @returns {Compiler}
+ */
+function Compiler(custom, opts) {
 
     opts = opts || {};
+    custom = custom || {};
 
-    if (opts.prefix) {
-        this.prefix = compile(opts.prefix, opts.custom, opts);
-    }
+    this.prefix = opts.prefix
+        ? compile(opts.prefix, custom, opts)
+        : "";
 
     this.compile = function (string) {
 
-        return this.prefix + compile(string, opts.custom, opts);
+        return this.prefix + compile(string, custom, opts);
 
     }.bind(this);
 

@@ -43,8 +43,8 @@ var compiler = require("tfunk").Compiler({
     prefix: "[{magenta:tFunk}]"
 });
 
-console.log( compiler.compile(" tFunk is awesome") );
-console.log( compiler.compile(" don't you think?") );
+console.log( compiler.compile("tFunk is awesome") );
+console.log( compiler.compile("don't you think?") );
 
 // => [tFunk] tFunk is awesome
 // => [tFunk] don't you think?
@@ -52,12 +52,13 @@ console.log( compiler.compile(" don't you think?") );
 
 **Define your own syntax**
 
-You can also utilise the chain-able features of chalk by specifying your own syntax like this.
+You can define your own methods, they receive the string section as the first parameter & have access to the compiler
+through `this.compile()` keyword.
 
 ```js
 var compiler = require("tfunk").Compiler({
-    custom: {
-        "warn": "chalk.bgRed.white"
+    "warn": function(string) {
+        return this.compile("{red:WARNING:" + string);
     }
 });
 ```
@@ -65,9 +66,9 @@ var compiler = require("tfunk").Compiler({
 Now you can use `warn` anywhere you like.
 
 ```js
-console.log( compiler.compile("Oh no! There was an {warn:Error") );
+console.log( compiler.compile("{warn: Could not file your config file...") );
 
-// => Oh no! There was an Error
+// => WARNING: Could not file your config file...
 ```
 
 ##Examples
