@@ -40,7 +40,8 @@
     "gulp": "^3.8.6",
     "gulp-jshint": "^1.7.1",
     "jshint-stylish": "^0.4.0",
-    "pegjs": "^0.8.0"
+    "pegjs": "^0.8.0",
+    "sinon": "^1.10.3"
   },
   "dependencies": {
     "chalk": "^0.5.1",

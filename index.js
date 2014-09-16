@@ -121,9 +121,15 @@ function Compiler(custom, opts) {
         ? compile(opts.prefix, custom, opts)
         : "";
 
-    this.compile = function (string) {
+    this.compile = function (string, noPrefix) {
 
-        return this.prefix + compile(string, custom, opts);
+        var out = "";
+
+        if (!noPrefix) {
+            out = this.prefix;
+        }
+
+        return out + compile(string, custom, opts);
 
     }.bind(this);
 

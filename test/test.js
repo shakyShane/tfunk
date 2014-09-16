@@ -34,7 +34,7 @@ describe("Adding Colors", function(){
 describe("Paths for chained CHALK methods", function(){
     it("", function(){
         var out = tfunk("{blue.bgRed.bold:This has two non-nested");
-        assert.equal(out, "This has two non-nested");
+        assert.equal(out, "\u001b[1m\u001b[41m\u001b[34mThis has two non-nested\u001b[39m\u001b[49m\u001b[22m");
     });
 });
 
@@ -42,10 +42,10 @@ describe("Custom functions", function(){
     it("can use custom functions", function(){
         var out = tfunk("{shane:This has two non-nested", {
             "shane": function () {
-                return "shane is awesome";
+                return "\u001b[31mshane is awesome\u001b[39m";
             }
         });
-        assert.equal(out, "shane is awesome");
+        assert.equal(out, "\u001b[31mshane is awesome\u001b[39m");
     });
     it("can use the compiler internally", function(){
         var out = tfunk("{shane:This has two non-nested", {
@@ -53,7 +53,7 @@ describe("Custom functions", function(){
                 return this.compile("{red:shane is awesome");
             }
         });
-        assert.equal(out, "shane is awesome");
+        assert.equal(out, "\u001b[31mshane is awesome\u001b[39m");
     });
 });
 
