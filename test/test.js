@@ -72,4 +72,20 @@ describe("Compiler instance", function(){
         var out = compiler.compile("{warn:HTML");
         assert.equal(out, "HTML + JS");
     });
+    it("Can use string for prefix", function(){
+        var compiler = new tfunk.Compiler({}, {
+            prefix: "SHANE "
+        });
+        var out = compiler.compile("HTML");
+        assert.equal(out, "SHANE HTML");
+    });
+    it("Can use function for prefix", function(){
+        var compiler = new tfunk.Compiler({}, {
+            prefix: function () {
+                return this.compile("SHANE ");
+            }
+        });
+        var out = compiler.compile("HTML");
+        assert.equal(out, "SHANE HTML");
+    });
 });

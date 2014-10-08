@@ -117,16 +117,27 @@ function Compiler(custom, opts) {
     opts = opts || {};
     custom = custom || {};
 
-    this.prefix = opts.prefix
-        ? compile(opts.prefix, custom, opts)
-        : "";
+    this.prefix = "";
+
+    if (typeof opts.prefix === "string") {
+        this.prefix = compile(opts.prefix, custom, opts);
+    }
+
+    if (typeof opts.prefix === "function") {
+        this.prefix = opts.prefix;
+    }
 
     this.compile = function (string, noPrefix) {
 
         var out = "";
 
         if (!noPrefix) {
-            out = this.prefix;
+
+            if (typeof this.prefix === "function") {
+                out = this.prefix.apply({compile: compile}, [string, opts]);
+            } else {
+                out = this.prefix;
+            }
         }
 
         return out + compile(string, custom, opts);

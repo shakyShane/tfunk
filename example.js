@@ -60,3 +60,11 @@ Pretty cool huh?
 */});
 
 console.log( tfunk(string) );
+
+var compiler3 = new tfunk.Compiler({}, {
+    prefix: function () {
+        return this.compile("{red:Custom prefix bro}");
+    }
+});
+
+console.log(compiler3.compile(" Oh yeah"));

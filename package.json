@@ -1,6 +1,6 @@
 {
   "name": "tfunk",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "repository": {
@@ -41,7 +41,8 @@
     "gulp-jshint": "^1.7.1",
     "jshint-stylish": "^0.4.0",
     "pegjs": "^0.8.0",
-    "sinon": "^1.10.3"
+    "sinon": "^1.10.3",
+    "multiline": "^1.0.1"
   },
   "dependencies": {
     "chalk": "^0.5.1",
