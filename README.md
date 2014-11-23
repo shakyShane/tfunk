@@ -148,6 +148,12 @@ Pretty cool huh?
 console.log( tFunk(string) );
 ```
 
+###Escaping when you need curly braces
+```js
+console.log( tFunk("This has a \\{\\{mustache\\}\\}") );
+```
+
+
 ##TODO
 - [x] Colours
 - [x] Nested Colours
