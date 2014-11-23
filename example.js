@@ -67,4 +67,4 @@ var compiler3 = new tfunk.Compiler({}, {
     }
 });
 
-console.log(compiler3.compile(" Oh yeah"));
+console.log(tfunk("Escaping is supported {green:\\{\\{double {blue:curlies}\\}\\}}"));

@@ -154,4 +154,4 @@ console.log( tFunk(string) );
 - [x] Custom syntax
 - [x] Prefixed compiler
 - [x] Make the chain-able API work like this `"{white.bgRed: White text, red BG"`
-- [ ] Offer a way of escaping. Right now, ALL instances of `}` will be lost
+- [x] Offer a way of escaping. Right now, ALL instances of `}` will be lost

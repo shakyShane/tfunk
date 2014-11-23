@@ -88,4 +88,16 @@ describe("Compiler instance", function(){
         var out = compiler.compile("HTML");
         assert.equal(out, "SHANE HTML");
     });
+    it("can output escaped { & }", function(){
+        var out = tfunk("\\{shane\\}");
+        assert.equal(out, "{shane}");
+    });
+    it("can output multiple escaped { & }", function(){
+        var out = tfunk("{green:\\{\\{shane\\}\\}} Some other");
+        assert.equal(stripColor(out), "{{shane}} Some other");
+    });
+    it("can use color inside escaped curlies", function(){
+        var out = tfunk("Escaping is supported {green:\\{\\{double {blue:curlies}\\}\\}}");
+        assert.equal(stripColor(out), "Escaping is supported {{double curlies}}");
+    });
 });

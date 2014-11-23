@@ -10,20 +10,34 @@ item
 buffer "buffer"
   = e:eol w:ws*
   { return {"buffer": e + w.join('')} }
-  / b:(!tag !reset c:. { return c })+
+  / b:(!tag !reset c:any { return c })+
   { return {"buffer": b.join('')} }
 
 tag
-  = ld c:color ":" e:(!ld !rd b:. {return b})+ { return {color: c, text: e.join('')}}
+  = ld c:color ":" e:(!ld !rd c:any{return c})+ { return {color: c, text: e.join('')}}
+
+any =
+  esc_left
+  / esc_right
+  / a:. {return a}
+
+esc_left
+  = esc_seq out:"{" {return out}
+
+esc_right
+  = esc_seq out:"}" {return out}
+
+esc_seq
+  = "\\"
 
 color
   = c:[a-zA-Z\.]+ { return c.join('') }
 
 reset
-  = rd e:after? {return {reset: true, text: e ? e.join('') : '' }}
+  = r:(!esc_right rd) e:after? {return {reset: true, text: e ? e.join('') : '' }}
 
 after
-  = (!ld !rd after:. {return after})+
+  = (!ld !rd after:any {return after})+
 
 ld
   = "{"
