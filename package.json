@@ -1,6 +1,6 @@
 {
   "name": "tfunk",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Multi-colour console output from chalk with added awesome",
   "repository": "shakyShane/tfunk",
   "keywords": [
