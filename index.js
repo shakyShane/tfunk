@@ -13,7 +13,7 @@ var objectPath = require("object-path");
  */
 function compile(string, custom, opts) {
     opts = opts || {};
-    return parseAst(createAst(parser, string), custom, function (err, out) {
+    return parseAst(createAst(parser, string), custom, function (err) {
         if (err) {
             if (opts.logErrors) {
                 console.log(err.msg);
@@ -142,7 +142,7 @@ function Compiler(custom, opts) {
 
         return out + compile(string, custom, opts);
 
-    }.bind(this);
+    };
 
     return this;
 }
