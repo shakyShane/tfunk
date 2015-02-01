@@ -1,6 +1,5 @@
 "use strict";
 
-//var compiler = require("./../index").Compiler();
 var tfunk      = require("..");
 var assert     = require("chai").assert;
 var stripColor = require("chalk").stripColor;

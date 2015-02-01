@@ -37,6 +37,7 @@ function createAst(parser, string) {
 /**
  * @param ast
  * @param custom
+ * @param {Function} cb
  */
 function parseAst(ast, custom, cb) {
 
