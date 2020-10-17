@@ -33,7 +33,7 @@ describe("Adding Colors", function(){
 });
 
 describe("Paths for chained CHALK methods", function(){
-    it("", function(){
+    it("accesses blue.bgRed.bold", function(){
         var out = tfunk("{blue.bgRed.bold:This has two non-nested");
         assert.equal(out, "\u001b[34m\u001b[41m\u001b[1mThis has two non-nested\u001b[22m\u001b[49m\u001b[39m");
     });
